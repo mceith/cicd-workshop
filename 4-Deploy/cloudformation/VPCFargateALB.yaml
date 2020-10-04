@@ -1,0 +1,457 @@
+Resources:
+
+## Setting up the VPC with 2 Private Subnets, 2 Public Subnets, IGW and NATGW
+  NewVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: NewVPC
+  NewVPCPublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.0.0/18
+      VpcId:
+        Ref: NewVPC
+      AvailabilityZone: eu-west-1a
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: NewVPC/PublicSubnet1
+    Metadata:
+      aws:cdk:path: NewVPC/PublicSubnet1/Subnet
+  NewVPCPublicSubnet1RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: NewVPC
+      Tags:
+        - Key: Name
+          Value: NewVPC/PublicSubnet1
+    Metadata:
+      aws:cdk:path: NewVPC/PublicSubnet1/RouteTable
+  NewVPCPublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: NewVPCPublicSubnet1RouteTable
+      SubnetId:
+        Ref: NewVPCPublicSubnet1
+    Metadata:
+      aws:cdk:path: NewVPC/PublicSubnet1/RouteTableAssociation
+  NewVPCPublicSubnet1DefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: NewVPCPublicSubnet1RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: NewVPCIGW
+    DependsOn:
+      - NewVPCVPCGW
+    Metadata:
+      aws:cdk:path: NewVPC/PublicSubnet1/DefaultRoute
+  NewVPCPublicSubnet:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: NewVPC/PublicSubnet1
+    Metadata:
+      aws:cdk:path: NewVPC/PublicSubnet1/EIP
+  NewVPCPublicSubnet1NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - NewVPCPublicSubnet
+          - AllocationId
+      SubnetId:
+        Ref: NewVPCPublicSubnet1
+      Tags:
+        - Key: Name
+          Value: NewVPC/PublicSubnet1
+    Metadata:
+      aws:cdk:path: NewVPC/PublicSubnet1/NATGateway
+  NewVPCPublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.64.0/18
+      VpcId:
+        Ref: NewVPC
+      AvailabilityZone: eu-west-1b
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Public
+        - Key: aws-cdk:subnet-type
+          Value: Public
+        - Key: Name
+          Value: NewVPC/PublicSubnet2
+    Metadata:
+      aws:cdk:path: NewVPC/PublicSubnet2/Subnet
+  NewVPCPublicSubnet2RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: NewVPC
+      Tags:
+        - Key: Name
+          Value: NewVPC/PublicSubnet2
+    Metadata:
+      aws:cdk:path: NewVPC/PublicSubnet2/RouteTable
+  NewVPCPublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: NewVPCPublicSubnet2RouteTable
+      SubnetId:
+        Ref: NewVPCPublicSubnet2
+    Metadata:
+      aws:cdk:path: NewVPC/PublicSubnet2/RouteTableAssociation
+  NewVPCPublicSubnet2DefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: NewVPCPublicSubnet2RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: NewVPCIGW
+    DependsOn:
+      - NewVPCVPCGW
+    Metadata:
+      aws:cdk:path: NewVPC/PublicSubnet2/DefaultRoute
+  NewVPCPrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.128.0/18
+      VpcId:
+        Ref: NewVPC
+      AvailabilityZone: eu-west-1a
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Private
+        - Key: aws-cdk:subnet-type
+          Value: Private
+        - Key: Name
+          Value: NewVPC/PrivateSubnet1
+    Metadata:
+      aws:cdk:path: NewVPC/PrivateSubnet1/Subnet
+  NewVPCPrivateSubnet1RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: NewVPC
+      Tags:
+        - Key: Name
+          Value: NewVPC/PrivateSubnet1
+    Metadata:
+      aws:cdk:path: NewVPC/PrivateSubnet1/RouteTable
+  NewVPCPrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: NewVPCPrivateSubnet1RouteTable
+      SubnetId:
+        Ref: NewVPCPrivateSubnet1
+    Metadata:
+      aws:cdk:path: NewVPC/PrivateSubnet1/RouteTableAssociation
+  NewVPCPrivateSubnet1DefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: NewVPCPrivateSubnet1RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NewVPCPublicSubnet1NATGateway
+    Metadata:
+      aws:cdk:path: NewVPC/PrivateSubnet1/DefaultRoute
+  NewVPCPrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.192.0/18
+      VpcId:
+        Ref: NewVPC
+      AvailabilityZone: eu-west-1b
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Private
+        - Key: aws-cdk:subnet-type
+          Value: Private
+        - Key: Name
+          Value: NewVPC/PrivateSubnet2
+    Metadata:
+      aws:cdk:path: NewVPC/PrivateSubnet2/Subnet
+  NewVPCPrivateSubnet2RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: NewVPC
+      Tags:
+        - Key: Name
+          Value: NewVPC/PrivateSubnet2
+    Metadata:
+      aws:cdk:path: NewVPC/PrivateSubnet2/RouteTable
+  NewVPCPrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: NewVPCPrivateSubnet2RouteTable
+      SubnetId:
+        Ref: NewVPCPrivateSubnet2
+    Metadata:
+      aws:cdk:path: NewVPC/PrivateSubnet2/RouteTableAssociation
+  NewVPCPrivateSubnet2DefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: NewVPCPrivateSubnet2RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NewVPCPublicSubnet1NATGateway
+    Metadata:
+      aws:cdk:path: NewVPC/PrivateSubnet2/DefaultRoute
+  NewVPCIGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: NewVPC
+    Metadata:
+      aws:cdk:path: NewVPC/IGW
+  NewVPCVPCGW:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: NewVPC
+      InternetGatewayId:
+        Ref: NewVPCIGW
+
+## Setting up service-related Infrastructure, LB, Fargate
+
+  # Application Load Balancer
+  PetClinicServiceALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: PetClinicLoadBalancer
+      LoadBalancerAttributes:
+        - Key: deletion_protection.enabled
+          Value: "false"
+        - Key: load_balancing.cross_zone.enabled
+          Value: "true"
+      Scheme: internet-facing
+      Subnets:
+        - Ref: NewVPCPublicSubnet1
+        - Ref: NewVPCPublicSubnet2
+      Type: network
+    DependsOn:
+      - NewVPCPublicSubnet1DefaultRoute
+      - NewVPCPublicSubnet2DefaultRoute
+
+  # Public Listener
+  PetClinicServiceLBPublicListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn:
+            Ref: PetClinicServiceLBPublicListenerECSGroup
+          Type: forward
+      LoadBalancerArn:
+        Ref: PetClinicServiceALB
+      Port: 80
+      Protocol: TCP
+
+  PetClinicServiceLBPublicTestListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn:
+            Ref: PetClinicServiceLBPublicTestListenerECSGroup
+          Type: forward
+      LoadBalancerArn:
+        Ref: PetClinicServiceALB
+      Port: 8080
+      Protocol: TCP
+
+  # Target Group 1 for Fargate tasks
+  PetClinicServiceLBPublicListenerECSGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: PetClinicTargetGroup1
+      HealthCheckPort: "8080"
+      Port: 8080
+      Protocol: TCP
+      TargetType: ip # For Fargate in awsvpc network mode (https://aws.amazon.com/premiumsupport/knowledge-center/create-alb-auto-register/)
+      VpcId:
+        Ref: NewVPC
+
+  # Target Group 2 for Fargate B/G
+  PetClinicServiceLBPublicTestListenerECSGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: PetClinicTargetGroup2
+      HealthCheckPort: "8080"
+      Port: 8080
+      Protocol: TCP
+      TargetType: ip # For Fargate in awsvpc network mode (https://aws.amazon.com/premiumsupport/knowledge-center/create-alb-auto-register/)
+      VpcId:
+        Ref: NewVPC
+
+  # Role for Fargate tasks
+  PetClinicServiceTaskDefTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: PetClinicTaskRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+
+  # Service Task Definition for running petclinic, including container definition
+  PetClinicServiceTaskDef:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        -
+          Image: tomcat:9.0
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group:
+                Ref: PetClinicServiceLogGroup
+              awslogs-stream-prefix: PetClinicService
+              awslogs-region: eu-west-1
+          Name: web
+          PortMappings:
+            - ContainerPort: 8080
+              Protocol: tcp
+      Cpu: "512"
+      ExecutionRoleArn:
+        Fn::GetAtt:
+          - PetClinicServiceTaskDefExecutionRole
+          - Arn
+      Family: PetClinicTaskDefinition
+      Memory: "1024"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn:
+        Fn::GetAtt:
+          - PetClinicServiceTaskDefTaskRole
+          - Arn
+
+  # Log Group for the Petclinic service
+  PetClinicServiceLogGroup:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+
+  PetClinicServiceTaskDefExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: PetClinicTaskExecutionRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+
+  PetClinicServiceTaskDefExecutionRoleDefaultPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - PetClinicServiceLogGroup
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: PetClinicServiceTaskDefExecutionRoleDefaultPolicy
+      Roles:
+        - Ref: PetClinicServiceTaskDefExecutionRole
+
+  PetClinicService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Ref: EcsDefaultCluster
+      DeploymentController:
+        Type: CODE_DEPLOY
+      DesiredCount: 2
+      EnableECSManagedTags: false
+      HealthCheckGracePeriodSeconds: 15
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: web
+          ContainerPort: 8080
+          TargetGroupArn:
+            Ref: PetClinicServiceLBPublicListenerECSGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::GetAtt:
+                - PetClinicServiceSecurityGroup
+                - GroupId
+          Subnets:
+            - Ref: NewVPCPrivateSubnet1
+            - Ref: NewVPCPrivateSubnet2
+      ServiceName: PetClinicService
+      TaskDefinition:
+        Ref: PetClinicServiceTaskDef
+    DependsOn:
+      - PetClinicServiceLBPublicListenerECSGroup
+      - PetClinicServiceLBPublicListener
+
+  PetClinicServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: PetClinicService/Service/SecurityGroup
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      SecurityGroupIngress: # Ingress for health check (comes from VPC)
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 10.0.0.0/16
+        - IpProtocol: tcp # Ingress from world on port 80 (NLB)
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # Ingress from world on port 8080 for test target group (NLB)
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+      VpcId:
+        Ref: NewVPC
+
+  EcsDefaultCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: PetclinicFargateCluster
+
+Outputs:
+  LoadBalancerDNS:
+    Value: !GetAtt PetClinicServiceALB.DNSName
+  ECSTaskExecutionRole:
+    Value: !GetAtt PetClinicServiceTaskDefExecutionRole.Arn

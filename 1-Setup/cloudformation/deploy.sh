@@ -1,0 +1,1 @@
+aws cloudformation deploy --stack-name cicd-workshop-pipeline --region eu-west-1 --template-file ./1-codepipeline-github-webhook.yaml --capabilities CAPABILITY_IAM --capabilities CAPABILITY_NAMED_IAM --parameter-overrides GitHubOwner=mpaf
