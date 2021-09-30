@@ -15,7 +15,15 @@ strategy.
  
  `4-Deploy/cloudformation/VPCFargateALB.yaml`
  
- If running this workshop on your own AWS account, create a stack with the above template
+ If running this workshop on your own AWS account, create a stack with the above template. If you are using Cloud9 IDE, go to workshop repository directory and run
+
+ ```
+  bash deploy.sh 
+ ```
+
+ It will take few moments to create needed resources. 
+
+![Create stack](./images/deploy-1.png)
  
 ## Create IAM role for CodeDeploy
  
@@ -48,7 +56,7 @@ Click 'Next' until you get to the 'Create role' screen where you need to input a
   
   ![CodeDeploy new application](./images/codedeploy-1.png)
   
-  2 - Now inside the CodeDeploy application click to *'add a Deployment Group'* most of the parameters can be filled from
+  2 - Now inside the CodeDeploy application click to *'Create deployment group'* most of the parameters can be filled from
   pre-populated items in the drop-downs. Choose a name for the deployment group, e.g. *petclinic-fargate*, pick the service
   role created in the previous step, and select the Fargate Cluster and Service that were created in your account.
   

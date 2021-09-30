@@ -1,7 +1,33 @@
 # Part 1 - Setup
 
-To begin the workshop fork the [spring-petclinic](https://github.com/spring-projects/spring-petclinic) repository and clone it into your local environment (or, if you prefer, to your 
-Cloud9 environment)
+## Create Cloud9 envinronment
+
+Open [Cloud9 console](https://eu-west-1.console.aws.amazon.com/cloud9) and create new Cloud9 environment.
+
+![Cloud9 console](images/cloud9-1.png)
+
+Leave the default setting as is and client "Next"
+
+![Cloud9 settings](images/cloud9-2.png)
+
+Click "Create envinroment"
+
+![Cloud9 settings](images/cloud9-3.png)
+
+Once the Cloud9 instance is running, create ssh-key on Cloud9 terminal and upload it to github that will be used during the workshop. 
+
+```
+~/environment $ ssh-keygen -t rsa
+```
+
+Hit enter few times and once the key is generated, copy and paste the content of ~/.ssh/id_rsa.pub to [Github SSH keys](https://github.com/settings/keys). Remeber to delete the key after the workshop!
+
+![Cloud9 settings](images/cloud9-4.png)
+
+## Fork and clone the petclinic and workshop repositories
+
+To begin the workshop fork the [petclinic](https://github.com/spring-projects/spring-petclinic) repository and clone it into your local environment (or, if you prefer, to your 
+Cloud9 environment). Also clone this repository. 
 
 `git clone https://github.com/<your-github-user>/spring-petclinic`
 
@@ -24,11 +50,20 @@ Open [Secrets Manager console](https://console.aws.amazon.com/secretsmanager/) a
 generated in the previous step as: 
 
 ```
-Secret name: MyGitHubSecret
 Secret key: PersonalToken
 ```
 
 ![Secrets Manager secret](images/secrets-manager-1.png)
+
+```
+Secret name: MyGitHubSecret
+```
+
+![Secrets Manager secret](images/secrets-manager-2.png)
+
+Disable automatic rotation: 
+
+![Secrets Manager secret](images/secrets-manager-3.png)
 
 ## Create the first Pipeline
 
@@ -61,7 +96,7 @@ After creating the stack, you should now have
 - a CodePipeline pipeline
 - IAM roles to be assumed by the CodeBuild project and the CodePipeline pipeline
 
-The pipeline triggers on new commits to the 'mainline' branch of your repo. And so far it will consist of two actions
+The pipeline triggers on new commits to the 'main' branch of your repo. And so far it will consist of two actions
 only, running in sequence: a *Source* action that gets the code from GitHub and zips it to the artifacts bucket, and
 a *Build* action that invoke a build in the CodeBuild project above.
 When creating the pipeline it will trigger once, get your code from GitHub, but the build will fail, since we haven't
