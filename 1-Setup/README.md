@@ -24,11 +24,20 @@ Open [Secrets Manager console](https://console.aws.amazon.com/secretsmanager/) a
 generated in the previous step as: 
 
 ```
-Secret name: MyGitHubSecret
 Secret key: PersonalToken
 ```
 
 ![Secrets Manager secret](images/secrets-manager-1.png)
+
+```
+Secret name: MyGitHubSecret
+```
+
+![Secrets Manager secret](images/secrets-manager-2.png)
+
+Disable automatic rotation: 
+
+![Secrets Manager secret](images/secrets-manager-3.png)
 
 ## Create the first Pipeline
 
@@ -61,7 +70,7 @@ After creating the stack, you should now have
 - a CodePipeline pipeline
 - IAM roles to be assumed by the CodeBuild project and the CodePipeline pipeline
 
-The pipeline triggers on new commits to the 'mainline' branch of your repo. And so far it will consist of two actions
+The pipeline triggers on new commits to the 'main' branch of your repo. And so far it will consist of two actions
 only, running in sequence: a *Source* action that gets the code from GitHub and zips it to the artifacts bucket, and
 a *Build* action that invoke a build in the CodeBuild project above.
 When creating the pipeline it will trigger once, get your code from GitHub, but the build will fail, since we haven't

@@ -42,7 +42,7 @@ build it within the same CodeBuild build project. Add the following to your repo
 
 **Dockerfile**
 ```Dockerfile
-FROM amazoncorretto
+FROM public.ecr.aws/amazoncorretto/amazoncorretto
 VOLUME /tmp
 ARG JAR_FILE
 ADD ./target/${JAR_FILE} app.jar
@@ -57,7 +57,15 @@ This is a simple Dockerfile that builds on top of the amazoncorreto Dockerhub im
 We need to now change our build specification to include the commands to build this docker image and publish it to a private
 [ECR repository](https://aws.amazon.com/ecr/). First let's create the repository by simply navigating to the 
 [ECR console](https://eu-west-1.console.aws.amazon.com/ecr/home?region=eu-west-1#) clicking on **Get Started** and provide
-a repository name, e.g. petclinic.
+a repository name, e.g. petclinic:
+
+![ECR repository](./images/ecr-repository-1.png)
+
+or create one with aws cli:
+
+``` 
+aws ecr create-repository --repository-name petclinic
+```
 
 Note the full path of your repository (URI), as we will need to tag the built image with that path. It will be of the form
 
