@@ -1,5 +1,11 @@
 # Part 1 - Setup
 
+## Select AWS Region
+
+Make sure you are running this lab on eu-west-1 region. 
+
+![Region selection](images/setup-reqion-1.png)
+
 ## Create Cloud9 envinronment
 
 Open [Cloud9 console](https://eu-west-1.console.aws.amazon.com/cloud9) and create new Cloud9 environment.
@@ -17,7 +23,7 @@ Click "Create envinroment"
 Once the Cloud9 instance is running, create ssh-key on Cloud9 terminal and upload it to github that will be used during the workshop. 
 
 ```
-~/environment $ ssh-keygen -t rsa
+ssh-keygen -t rsa
 ```
 
 Hit enter few times and once the key is generated, copy and paste the content of ~/.ssh/id_rsa.pub to [Github SSH keys](https://github.com/settings/keys). Remeber to delete the key after the workshop!
@@ -55,13 +61,15 @@ Secret key: PersonalToken
 
 ![Secrets Manager secret](images/secrets-manager-1.png)
 
+Click "Next step"
+
 ```
 Secret name: MyGitHubSecret
 ```
 
 ![Secrets Manager secret](images/secrets-manager-2.png)
 
-Disable automatic rotation: 
+Disable automatic rotation and click "Next step": 
 
 ![Secrets Manager secret](images/secrets-manager-3.png)
 
